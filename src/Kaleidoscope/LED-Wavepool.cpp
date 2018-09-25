@@ -41,13 +41,11 @@ PROGMEM const uint8_t WavepoolEffect::rc2pos[ROWS*COLS] = {
 WavepoolEffect::WavepoolEffect(void) {
 }
 
-void WavepoolEffect::setup(void) {
-  Kaleidoscope.useEventHandlerHook(eventHandlerHook);
-}
+void WavepoolEffect::setup(void) {}
 
-Key WavepoolEffect::eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state) {
+kaleidoscope::EventHandlerResult WavepoolEffect::onKeyswitchEvent(Key &mapped_key, byte row, byte col, uint8_t key_state) {
   if (row >= ROWS || col >= COLS)
-    return mapped_key;
+    return kaleidoscope::EventHandlerResult::OK;
 
   if (keyIsPressed(key_state)) {
     uint8_t offset = (row*COLS)+col;
@@ -55,7 +53,7 @@ Key WavepoolEffect::eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t
     frames_since_event = 0;
   }
 
-  return mapped_key;
+  return kaleidoscope::EventHandlerResult::OK;
 }
 
 void WavepoolEffect::raindrop(uint8_t x, uint8_t y, int8_t *page) {
@@ -73,14 +71,14 @@ void WavepoolEffect::raindrop(uint8_t x, uint8_t y, int8_t *page) {
 uint8_t WavepoolEffect::wp_rand() {
     static uint16_t offset = 0x400;
     offset = ((offset + 1) & 0x4fff) | 0x400;
-    return (millis()/MS_PER_FRAME) + pgm_read_byte(offset);
+    return (Kaleidoscope.millisAtCycleStart()/MS_PER_FRAME) + pgm_read_byte(offset);
 }
 
 void WavepoolEffect::update(void) {
 
   // limit the frame rate; one frame every 64 ms
   static uint8_t prev_time = 0;
-  uint8_t now = millis() / MS_PER_FRAME;
+  uint8_t now = Kaleidoscope.millisAtCycleStart() / MS_PER_FRAME;
   if (now != prev_time) {
       prev_time = now;
   } else {

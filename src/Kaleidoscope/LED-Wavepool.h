@@ -32,6 +32,8 @@ class WavepoolEffect : public LEDMode {
   // ms before idle animation starts after last keypress
   static uint16_t idle_timeout;
 
+  kaleidoscope::EventHandlerResult onKeyswitchEvent(Key &mapped_key, byte row, byte col, uint8_t key_state);
+
  protected:
   void setup(void) final;
   void update(void) final;
